@@ -1,0 +1,144 @@
+CREATE  TABLE Benutzer
+ (
+    Name		VARCHAR(64)	NOT NULL,
+    Vorname		VARCHAR(64)	NOT NULL,
+    EmailAdr		VARCHAR(64)	NOT NULL	UNIQUE,
+    TelefonNr		VARCHAR(64)	NOT NULL,
+    Ausbildung		VARCHAR(255)	NOT NULL,
+    Erfahrung		LONGTEXT	NULL,
+    Admin		BOOLEAN		NOT NULL 	DEFAULT 0,
+    GebDatum		DATE		NOT NULL,
+    BenutzerID		INTEGER		NOT NULL	AUTO_INCREMENT,
+    Passwort		VARCHAR(255)	NOT NULL	UNIQUE,
+    Profilbild		VARCHAR(255)	NOT NULL	DEFAULT "PB.jpg",
+
+   PRIMARY KEY (BenutzerID,EmailAdr,Passwort)
+
+);
+
+CREATE TABLE Nachricht
+(
+    NachrichtenID	INTEGER		NOT NULL	AUTO_INCREMENT,
+    EmpfaengerID	INTEGER		NOT NULL,
+    SenderID		INTEGER		NOT NULL,
+    Gelesen		BOOLEAN		NOT NULL	DEFAULT 0,
+    Datum		TIMESTAMP	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+    Inhalt		VARCHAR		NOT NULL,
+
+    PRIMARY KEY (NachrichtenID,EmpfaengerID)
+
+    FOREIGN KEY (EmpfaengerID)
+      REFERENCES Benutzer (BenutzerID)
+    ON UPDATE RESTRICT
+    ON DELETE SET NULL,
+
+    FOREIGN KEY (SenderID)
+      REFERENCES Benutzer (BenutzerID)
+    ON UPDATE RESTRICT
+    ON DELETE SET NULL
+
+
+);
+
+
+CREATE TABLE Projekt
+(
+    Name		VARCHAR(128)	NOT NULL 	UNIQUE,
+    Beschreibung 	LONGTEXT	NOT NULL,
+    ErstelltAm		TIMESTAMP	NOT NULL	DEFAULT CURRENT_TIMESTAMP,
+    ProjektID		INTEGER		NOT NULL	AUTO_INCREMENT,
+
+
+    PRIMARY KEY (ProjektID,Name)
+
+);
+
+
+CREATE TABLE ProjektLeiter  
+(
+    BenutzerID		INTEGER 	NOT NULL,
+    ProjektID		INTEGER 	NOT NULL 	UNIQUE,
+ 
+    PRIMARY KEY (BenutzerID, ProjektID),
+
+    FOREIGN KEY (BenutzerID)
+      REFERENCES Benutzer (BenutzerID)
+    ON UPDATE RESTRICT
+    ON DELETE RESTRICT,
+
+    FOREIGN KEY (ProjektID)
+      REFERENCES Projekt (ProjektID)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+);
+
+
+CREATE TABLE ProjektMitarbeiter  
+(
+    BenutzerID		INTEGER NOT NULL,
+    ProjektID		INTEGER NOT NULL,
+ 
+    PRIMARY KEY (BenutzerID, ProjektID),
+
+    FOREIGN KEY (BenutzerID)
+      REFERENCES Benutzer (BenutzerID)
+    ON UPDATE CASCADE
+    ON DELETE RESTRICT,
+
+    FOREIGN KEY (ProjektID)
+      REFERENCES Projekt (ProjektID)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+);
+
+ CREATE TABLE Raeume  
+(
+    Name             	VARCHAR(146)	NOT NULL 	UNIQUE,
+    Beschreibung  	LONGTEXT  	NOT NULL,
+    RaumID 		INTEGER         NOT NULL 	AUTO_INCREMENT,
+    Projekt		INTEGER		NULL,
+
+    PRIMARY KEY (RaumID,Name),
+
+    FOREIGN KEY (Projekt)
+      REFERENCES Projekt (ProjektID)
+    ON UPDATE RESTRICT
+    ON DELETE SET NULL
+
+);
+
+
+CREATE TABLE Zeitplan 
+(
+    Anfang 		DATE 		NOT NULL,
+    Ende 		DATE 		NOT NULL,
+    ZeitplanID 		INTEGER		NOT NULL 	AUTO_INCREMENT,
+    Projekt		INTEGER		NULL,
+
+    PRIMARY KEY (ZeitplanID,Projekt),
+
+
+    FOREIGN KEY (Projekt)
+      REFERENCES Projekt (ProjektID)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+
+);
+
+CREATE TABLE Reservierung
+(
+    Anfang 		DATE 		NOT NULL,
+    Ende 		DATE 		NOT NULL,
+    ReservierungID 	INTEGER		NOT NULL 	AUTO_INCREMENT,
+    Raum		INTEGER		NULL,
+
+    PRIMARY KEY (ReservierungID,Raum),
+
+
+    FOREIGN KEY (Raum)
+      REFERENCES Raeume (RaumID)
+    ON UPDATE RESTRICT
+    ON DELETE CASCADE
+
+);
+
